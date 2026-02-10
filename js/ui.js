@@ -188,9 +188,16 @@ const UI = (() => {
                 <p class="text-white/70 text-xs font-semibold uppercase tracking-wider mb-1">${formatDay(day.dt)}</p>
                 <p class="text-white/50 text-xs mb-3">${formatShortDate(day.dt)}</p>
                 <img src="${WeatherAPI.getIconUrl(day.weather[0].icon)}" alt="${day.weather[0].description}" class="w-12 h-12 mx-auto mb-2 drop-shadow-md">
-                <p class="text-white font-bold text-lg mb-1">${Math.round(day.tempMax)}° / ${Math.round(day.tempMin)}°</p>
                 <p class="text-white/60 text-xs capitalize mb-3">${day.weather[0].description}</p>
                 <div class="space-y-1.5 text-xs">
+                    <div class="flex items-center justify-center gap-1.5 text-white/70">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="font-semibold">${Math.round(day.tempMax)}°</span>
+                        <span class="text-white/40">/</span>
+                        <span>${Math.round(day.tempMin)}°</span>
+                    </div>
                     <div class="flex items-center justify-center gap-1.5 text-white/60">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
