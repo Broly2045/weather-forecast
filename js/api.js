@@ -4,8 +4,8 @@
 // ============================================
 
 const WeatherAPI = (() => {
-    // Replace with your own OpenWeatherMap API key
-    const API_KEY = "YOUR_API_KEY_HERE";
+    
+    const API_KEY = "dd89cf9ad6c4244ffa4e7bf50ee52e4d";
     const BASE_URL = "https://api.openweathermap.org/data/2.5";
     const ICON_URL = "https://openweathermap.org/img/wn";
 
