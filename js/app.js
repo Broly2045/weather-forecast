@@ -58,6 +58,11 @@ const App = (() => {
         const validation = validateCityInput(city);
         if (!validation.valid) {
             UI.showError(validation.error);
+            // Visual feedback: shake the input and briefly highlight it red
+            cityInput.classList.add("shake", "input-error");
+            setTimeout(() => {
+                cityInput.classList.remove("shake", "input-error");
+            }, 600);
             return;
         }
 
