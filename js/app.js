@@ -13,6 +13,9 @@ const App = (() => {
     // Track current "feels like" temperature in Celsius for unit conversion
     let currentFeelsLikeCelsius = null;
 
+    // Debounce timer for city suggestions
+    let suggestDebounceTimer = null;
+
     // --- Input Validation ---
 
     /**
@@ -167,12 +170,14 @@ const App = (() => {
 
     // Search button click
     searchBtn.addEventListener("click", () => {
+        UI.hideSuggestions();
         searchByCity(cityInput.value);
     });
 
     // Enter key on input field
     cityInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
+            UI.hideSuggestions();
             searchByCity(cityInput.value);
         }
     });
@@ -182,21 +187,69 @@ const App = (() => {
         searchByLocation();
     });
 
-    // Show recent cities dropdown when input is focused
+    // Show recent cities dropdown when input is focused (only if input is empty)
     cityInput.addEventListener("focus", () => {
-        const cities = Storage.getRecentCities();
-        if (cities.length > 0) {
-            refreshRecentCitiesDropdown();
-            UI.showRecentCities();
+        if (cityInput.value.trim().length === 0) {
+            const cities = Storage.getRecentCities();
+            if (cities.length > 0) {
+                UI.hideSuggestions();
+                refreshRecentCitiesDropdown();
+                UI.showRecentCities();
+            }
         }
     });
 
-    // Hide dropdown when clicking outside
-    document.addEventListener("click", (e) => {
-        const dropdown = document.getElementById("recent-cities-dropdown");
-        const input = cityInput;
-        if (!dropdown.contains(e.target) && e.target !== input) {
+    // Debounced city suggestions as user types
+    cityInput.addEventListener("input", () => {
+        const query = cityInput.value.trim();
+
+        // Clear previous timer
+        clearTimeout(suggestDebounceTimer);
+
+        // If input is empty, hide suggestions and show recent cities
+        if (query.length === 0) {
+            UI.hideSuggestions();
+            const cities = Storage.getRecentCities();
+            if (cities.length > 0) {
+                refreshRecentCitiesDropdown();
+                UI.showRecentCities();
+            }
+            return;
+        }
+
+        // Need at least 2 characters to search
+        if (query.length < 2) {
+            UI.hideSuggestions();
             UI.hideRecentCities();
+            return;
+        }
+
+        // Hide recent cities when typing
+        UI.hideRecentCities();
+
+        // Debounce: wait 300ms after user stops typing
+        suggestDebounceTimer = setTimeout(async () => {
+            try {
+                const results = await WeatherAPI.getCitySuggestions(query);
+                UI.renderSuggestions(results, (cityName) => {
+                    cityInput.value = "";
+                    searchByCity(cityName);
+                });
+            } catch {
+                // Silently ignore suggestion errors — don't disrupt the user
+                UI.hideSuggestions();
+            }
+        }, 300);
+    });
+
+    // Hide dropdowns when clicking outside
+    document.addEventListener("click", (e) => {
+        const recentDropdown = document.getElementById("recent-cities-dropdown");
+        const suggestionsDropdown = document.getElementById("suggestions-dropdown");
+        const input = cityInput;
+        if (!recentDropdown.contains(e.target) && !suggestionsDropdown.contains(e.target) && e.target !== input) {
+            UI.hideRecentCities();
+            UI.hideSuggestions();
         }
     });
 

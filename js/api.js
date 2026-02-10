@@ -88,6 +88,17 @@ const WeatherAPI = (() => {
     }
 
     /**
+     * Search for city name suggestions using the Geocoding API
+     * @param {string} query - Partial city name (minimum 2 characters)
+     * @param {number} limit - Max number of results (default 5)
+     * @returns {Promise<Array>} Array of city objects with name, country, state, lat, lon
+     */
+    async function getCitySuggestions(query, limit = 5) {
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${API_KEY}`;
+        return fetchData(url);
+    }
+
+    /**
      * Build the full URL for a weather icon
      * @param {string} iconCode - Icon code from API (e.g., "01d", "10n")
      * @returns {string} Full icon URL
@@ -102,6 +113,7 @@ const WeatherAPI = (() => {
         getCurrentWeatherByCoords,
         getForecast,
         getForecastByCoords,
+        getCitySuggestions,
         getIconUrl,
     };
 })();

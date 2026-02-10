@@ -20,6 +20,8 @@ const UI = (() => {
         currentPressure: document.getElementById("current-pressure"),
         currentVisibility: document.getElementById("current-visibility"),
         forecastContainer: document.getElementById("forecast-container"),
+        suggestionsDropdown: document.getElementById("suggestions-dropdown"),
+        suggestionsList: document.getElementById("suggestions-list"),
         recentDropdown: document.getElementById("recent-cities-dropdown"),
         recentList: document.getElementById("recent-cities-list"),
         toastContainer: document.getElementById("toast-container"),
@@ -262,6 +264,53 @@ const UI = (() => {
         elements.recentDropdown.classList.add("hidden");
     }
 
+    // --- City Suggestions ---
+
+    /**
+     * Render city suggestions from the Geocoding API
+     * @param {Array} suggestions - Array of geocoding results
+     * @param {Function} onSelect - Callback when a suggestion is clicked
+     */
+    function renderSuggestions(suggestions, onSelect) {
+        elements.suggestionsList.innerHTML = "";
+
+        if (!suggestions || suggestions.length === 0) {
+            hideSuggestions();
+            return;
+        }
+
+        // Hide recent cities when showing suggestions
+        hideRecentCities();
+
+        suggestions.forEach((city) => {
+            const label = [city.name, city.state, city.country].filter(Boolean).join(", ");
+            const li = document.createElement("li");
+            li.className = "recent-city-item";
+            li.innerHTML = `
+                <svg class="w-4 h-4 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="flex-1">${label}</span>
+                <svg class="w-3.5 h-3.5 text-white/30 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            `;
+            li.addEventListener("click", () => {
+                onSelect(city.name);
+                hideSuggestions();
+            });
+            elements.suggestionsList.appendChild(li);
+        });
+
+        elements.suggestionsDropdown.classList.remove("hidden");
+    }
+
+    /** Hide the suggestions dropdown */
+    function hideSuggestions() {
+        elements.suggestionsDropdown.classList.add("hidden");
+    }
+
     // --- Toast Notifications ---
 
     /**
@@ -458,6 +507,8 @@ const UI = (() => {
         renderRecentCities,
         showRecentCities,
         hideRecentCities,
+        renderSuggestions,
+        hideSuggestions,
         showToast,
         showError,
         updateBackground,
